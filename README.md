@@ -1,2 +1,5 @@
 # nixos-config
-My NixOS configuration ❄️
+
+Simple repository containing my NixOS configuration.
+
+
