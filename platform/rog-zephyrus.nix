@@ -9,21 +9,16 @@
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
       # specific hardware configuration
-      ./rog-zephyrus.nix
+      ./rog-zephyrus-hardware.nix
       # personal configurations
-      ./okjesus-configuration.nix
+      ./common-userspace.nix
     ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+  networking.hostName = "jesus";
 
   # Enable networking
   networking.networkmanager.enable = true;
@@ -72,6 +67,32 @@
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
   ];
+
+  # support japanese + chinese input methods
+  i18n.inputMethod = {
+    enable = true;
+    type = "fcitx5";
+    fcitx5 = {
+      waylandFrontend = true;
+      ignoreUserConfig = true;    # Use settings below, ignore user config
+      addons = with pkgs; [
+        fcitx5-chewing    # Chewing (Traditional Chinese)
+        fcitx5-chinese-addons
+        fcitx5-mozc       # Japanese input method
+      ];
+      settings = {
+        inputMethod = {
+          "Groups/0" = {
+            Name = "Default";
+            "Default Layout" = "fr";
+            DefaultIM = "keyboard-fr";
+          };
+          "Groups/0/Items/0".Name = "mozc";
+          "Groups/0/Items/1".Name = "chewing";
+        };
+      };
+    };
+  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.

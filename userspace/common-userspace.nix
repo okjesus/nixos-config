@@ -32,6 +32,7 @@ in
     zellij
     mako
     swaybg
+    waybar
     swayidle
     greetd.greetd
     pciutils
@@ -46,6 +47,15 @@ in
     dbus-broker
     vscode
     v4l-utils
+    vulkaninfo
+    curl
+    gnupg
+    zip
+    make
+    maven
+    javaPackages.compiler.openjdk8
+    ungoogled-chromium
+    steam
   ] ++ (with unstable; [
     # unstable packages
     wlgreet
@@ -75,8 +85,8 @@ in
   # niri setup
   programs.niri.enable = true;
 
-  # waybar setup
-  #programs.waybar.enable = true;
+  # steam
+  programs.steam.enable = true
 
   # network manager
   networking.networkmanager.enable = true;
@@ -162,30 +172,4 @@ in
       });
     })
   ];
-
-  # support japanese + chinese input methods
-  i18n.inputMethod = {
-    enable = true;
-    type = "fcitx5";
-    fcitx5 = {
-      waylandFrontend = true;
-      ignoreUserConfig = true;    # Use settings below, ignore user config
-      addons = with pkgs; [
-        fcitx5-chewing    # Chewing (Traditional Chinese)
-        fcitx5-chinese-addons
-        fcitx5-mozc       # Japanese input method
-      ];
-      settings = {
-        inputMethod = {
-          "Groups/0" = {
-            Name = "Default";
-            "Default Layout" = "fr";
-            DefaultIM = "keyboard-fr";
-          };
-          "Groups/0/Items/0".Name = "mozc";
-          "Groups/0/Items/1".Name = "chewing";
-        };
-      };
-    };
-  };
 }

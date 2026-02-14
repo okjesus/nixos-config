@@ -3,7 +3,7 @@
 { config, pkgs, ...}:
 
 {
-  # enable OpenGL
+  # enable graphics acceleration
   hardware.graphics = {
     enable = true;
   };
