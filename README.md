@@ -41,14 +41,22 @@ flowchart
   end
 ```
 
-This is done in the `jephthah.nix` using the import directives:
+## how to use it
+
+- Download the `.nix` file you want
+
+- Please add the `.nix` file in your `imports`:
+
 ```nix
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      # specific hardware configuration
-      ./jephthah-hardware.nix
-      # personal configurations
+      # You just need the common part
+      # Please adjust the path if necessary
       ./common-userspace.nix
     ];
 ```
+
+- rebuild your nixos : `sudo nixos-rebuild switch`
+
+After that you should be ready.

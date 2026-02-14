@@ -47,11 +47,10 @@ in
     dbus-broker
     vscode
     v4l-utils
-    vulkaninfo
+    vulkan-tools
     curl
     gnupg
     zip
-    make
     maven
     javaPackages.compiler.openjdk8
     ungoogled-chromium
