@@ -1,4 +1,4 @@
-# okjesus nixos configuration
+# common-userspace nixos configuration
 
 { config, pkgs, ... }:
 
@@ -11,6 +11,9 @@ let
       allowUnfree = true;
     };
   };
+
+  awww-flake = builtins.getFlake "git+https://codeberg.org/LGFae/awww";
+  awww-pkg = awww-flake.packages.${pkgs.stdenv.hostPlatform.system}.awww;
 in
 {
   # automatic upgrades
@@ -18,6 +21,7 @@ in
   system.autoUpgrade.allowReboot = true;
 
   # packages
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
   environment.systemPackages = with pkgs; [
     # stable packages
     usbutils
@@ -34,7 +38,7 @@ in
     swaybg
     waybar
     swayidle
-    greetd.greetd
+    greetd
     pciutils
     nautilus
     wofi
@@ -45,7 +49,7 @@ in
     obs-studio-plugins.obs-pipewire-audio-capture
     pipewire
     dbus-broker
-    vscode
+    vscodium
     v4l-utils
     vulkan-tools
     curl
@@ -55,6 +59,12 @@ in
     javaPackages.compiler.openjdk8
     ungoogled-chromium
     steam
+    blender
+    parted
+    blueman
+    zsh
+    oh-my-posh
+    awww-pkg
   ] ++ (with unstable; [
     # unstable packages
     wlgreet
@@ -67,25 +77,42 @@ in
     XDG_SESSION_DESKTOP = "niri";
   };
 
-  # greetd
-  services.greetd = {
-    enable = true;
-    settings = {
-      default_session = {
-        command = "${pkgs.niri}/bin/niri --config /etc/niri/config.kdl --session";
-        user = "okjesus";
-      };
+  # sddm
+  services.displayManager = {
+    gdm = {
+    	enable = true;
+    	wayland = true;
+        banner = "Recommande ton sort a l'Eternel, mets en Lui ta confiance et Il agira.";
+        autoSuspend = true;
+    };
+    autoLogin = {
+    	enable = true;
+	user = "jesus";
     };
   };
 
-  # gnome
-  services.xserver.desktopManager.gnome.enable = true;
+  # zsh
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    autosuggestions.enable = true;
+    syntaxHighlighting.enable = true;
+    shellInit = ''
+      eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/themes/spaceship.omp.json)"
+    '';
+  };
+  environment.shells = [ pkgs.zsh ];
+
+  users.defaultUserShell = pkgs.zsh;
+  
+  # blueman
+  services.blueman.enable = true;
 
   # niri setup
   programs.niri.enable = true;
 
   # steam
-  programs.steam.enable = true
+  programs.steam.enable = true;
 
   # network manager
   networking.networkmanager.enable = true;
@@ -128,10 +155,10 @@ in
   };
   
 
-  # Enable the GNOME Virtual File System for network and trash support.
+  # enable the GNOME Virtual File System for network and trash support.
   services.gvfs.enable = true;
 
-  # Fonts
+  # fonts
   fonts = {
     fontDir.enable = true;
     fontconfig.enable = true;
@@ -141,7 +168,14 @@ in
     nerd-fonts.fira-code
     nerd-fonts.jetbrains-mono
     nerd-fonts.droid-sans-mono
-  ]; 
+    openmoji-color
+  ];
+
+  fonts.fontconfig = {
+    defaultFonts = {
+      emoji = [ "OpenMoji Color" ];
+    };
+  };
 
   # obs
   programs.obs-studio = {
@@ -171,4 +205,5 @@ in
       });
     })
   ];
+
 }
