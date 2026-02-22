@@ -11,9 +11,12 @@ let
       allowUnfree = true;
     };
   };
-
   awww-flake = builtins.getFlake "git+https://codeberg.org/LGFae/awww";
   awww-pkg = awww-flake.packages.${pkgs.stdenv.hostPlatform.system}.awww;
+  protonGeCompat = pkgs.runCommand "proton-ge-bin-compat" { nativeBuildInputs = [ pkgs.coreutils  ]; } ''
+    mkdir -p "$out"
+    install -m 0644 ${pkgs.proton-ge-bin} "$out/proton-ge-bin"
+  '';
 in
 {
   # automatic upgrades
@@ -55,16 +58,28 @@ in
     curl
     gnupg
     zip
+    git-repo
+    pass
+    pinentry-curses
+    curl
+    zip
+    unzip
     maven
     javaPackages.compiler.openjdk8
     ungoogled-chromium
     steam
+    xwayland-satellite
     blender
     parted
     blueman
     zsh
     oh-my-posh
     awww-pkg
+    wireguard-tools
+    protonvpn-gui
+    fcitx5
+    fcitx5-mozc
+    qt6Packages.fcitx5-chinese-addons
   ] ++ (with unstable; [
     # unstable packages
     wlgreet
@@ -82,7 +97,7 @@ in
     gdm = {
     	enable = true;
     	wayland = true;
-        banner = "Recommande ton sort a l'Eternel, mets en Lui ta confiance et Il agira.";
+        banner = "Behold the Lamb of God.";
         autoSuspend = true;
     };
     autoLogin = {
@@ -112,9 +127,17 @@ in
   programs.niri.enable = true;
 
   # steam
-  programs.steam.enable = true;
+  programs.steam = {
+    enable = true;
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+    extraCompatPackages = with pkgs; [ 
+      protonGeCompat 
+    ];
+  };
 
-  # network manager
+  # networking
+  networking.firewall.checkReversePath = false;
   networking.networkmanager.enable = true;
 
   # pipewire
@@ -154,7 +177,6 @@ in
     };
   };
   
-
   # enable the GNOME Virtual File System for network and trash support.
   services.gvfs.enable = true;
 
@@ -168,13 +190,48 @@ in
     nerd-fonts.fira-code
     nerd-fonts.jetbrains-mono
     nerd-fonts.droid-sans-mono
+    noto-fonts
     openmoji-color
+    ipafont
+    kochi-substitute
   ];
 
   fonts.fontconfig = {
     defaultFonts = {
+      monospace = [
+        "JetBrainsMono Nerd Font"
+        "Noto Sans Mono"
+        "Noto Sans Japanese"
+        "Noto Sans Simplified Chinese"
+        "Noto Sans Korean"
+        "Noto Sans Traditional Chinese"
+      ];
+
+      serif = [
+        "Noto Serif"
+        "Noto Serif Japanese"
+        "Noto Serif Korean"
+        "Noto Serif Traditional Chinese"
+        "Noto Serif Simplified Chinese"
+      ];
+
+      sansSerif = [
+        "Noto Sans"
+        "Noto Sans Korean"
+        "Noto Sans Traditional Chinese"
+        "Noto Sans Simplified Chinese"
+      ];
       emoji = [ "OpenMoji Color" ];
     };
+  };
+
+  i18n.inputMethod = {
+    type = "fcitx5";
+    enable = true;
+    fcitx5.addons = with pkgs; [
+        fcitx5-mozc
+        qt6Packages.fcitx5-chinese-addons
+    ];
   };
 
   # obs
@@ -189,10 +246,17 @@ in
       obs-gstreamer
       obs-vkcapture
     ];
-  }; 
+  };
+ 
   security.polkit.enable = true;
   boot.extraModulePackages = with config.boot.kernelPackages; [ v4l2loopback ];
   boot.kernelModules = [ "v4l2loopback" ];
+
+  # pinentry
+  programs.gnupg.agent = {
+    enable = true;
+    enableSSHSupport = true;
+  };
 
   # overlays
   nixpkgs.overlays = [
